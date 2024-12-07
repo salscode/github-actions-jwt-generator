@@ -5,14 +5,23 @@ Do you want to send an HTTP request using HTTPie or CURL with a signed JWT token
 ## Installation
 ```yaml
 - name: JWT Generator
-  uses: morzzz007/github-actions-jwt-generator@1.0.1
+  uses: salscode/github-actions-jwt-generator@1.0.0
 ```
 
 ## Usage
 
 The required inputs are `secret` and `payload`. It is recommended to store the secret as an encrypted [environment variable.](https://help.github.com/en/articles/virtual-environments-for-github-actions#creating-and-using-secrets-encrypted-variables)
 
-The output where the generated token is in `token`. To use it in a next step use `${{steps.<step_id>.outputs.token}}`. The token is generated with default HMAC SHA256 algorithm.
+### Inputs
+
+- `secret` (required): The shared secret used to sign the JWTs
+- `payload` (required): The payload to encrypt (must be valid JSON)
+
+### Outputs
+
+- `token`: The generated JWT token
+
+The token is generated with the specified HMAC SHA algorithm (defaults to HS256).
 
 ### Example usage
 ```yaml
@@ -25,11 +34,33 @@ jobs:
     steps:
       - name: JWT Generator
         id: jwtGenerator
-        uses: morzzz007/github-actions-jwt-generator@1.0.1
+        uses: salscode/github-actions-jwt-generator@1.0.0
         with:
-          secret: topsecret
+          secret: ${{ secrets.JWT_SECRET }}
           payload: '{"hello":"world"}'
-      - name: DUMP Token
-        run: echo ${{steps.jwtGenerator.outputs.token}}
-
+      - name: Use Token
+        run: echo ${{ steps.jwtGenerator.outputs.token }}
 ```
+
+## Development
+
+This action requires production dependencies to be committed to the repository. When making changes:
+
+1. Install dev dependencies for development:
+```bash
+yarn install
+```
+
+2. Make your changes and test:
+```bash
+yarn build
+yarn test
+```
+
+3. Prepare for release:
+```bash
+rm -rf node_modules
+yarn install --production
+```
+
+4. Commit and create a new release

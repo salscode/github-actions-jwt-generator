@@ -5,21 +5,32 @@ jobs:
   check_pr:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
 
-    - name: "npm ci"
-      run: npm ci
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
 
-    - name: "npm run build"
-      run: npm run build
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
 
-    - name: "npm run test"
-      run: npm run test
+    - name: Build
+      run: yarn build
 
-    - name: "check for uncommitted changes"
-      # Ensure no changes, but ignore node_modules dir since dev/fresh ci deps installed.
+    - name: Format check
+      run: yarn format-check
+    
+    - name: Lint
+      run: yarn lint
+
+    - name: Test
+      run: yarn test
+
+    - name: Check for uncommitted changes
       run: |
         git diff --exit-code --stat -- . ':!node_modules' \
-        || (echo "##[error] found changed files after build. please 'npm run build && npm run format'" \
+        || (echo "##[error] found changed files after build. please run 'yarn all'" \
                  "and check in all changes" \
             && exit 1)

@@ -1,17 +1,26 @@
 name: 'JWT Generator'
 description: 'Generate JWT tokens (JSON Web Tokens)'
-author: 'Marton Papp <morz@morz.hu>'
+author: 'Sal Sodano'
 inputs:
   secret:
     description: 'The shared secret used to sign the JWTs'
+    required: true
   payload:
-    description: 'The payload to encrypt'
+    description: 'The payload to encrypt (must be valid JSON)'
+    required: true
+  algorithm:
+    description: 'The algorithm to use for signing (HS256, HS384, HS512)'
+    required: false
+    default: 'HS256'
+  expiresIn:
+    description: 'Token expiration time (e.g. "1h", "2d")'
+    required: false
 outputs:
   token:
     description: 'Generated JWT Token'
 runs:
-  using: 'node12'
-  main: 'lib/main.js'
+  using: 'node20'
+  main: 'dist/index.js'
 branding:
   icon: 'lock'
   color: 'yellow'
